@@ -1,0 +1,122 @@
+function get_sets()
+AccIndex = 1
+AccArray = {"LowACC","MidACC","HighACC"} -- 3 Levels Of Accuracy Sets For Shooting/TP/WS. First Set Is LowACC. Add More ACC Sets If Needed Then Create Your New ACC Below. Most of These Sets Are Empty So You Need To Edit Them On Your Own. Remember To Check What The Combined Set Is For Each Sets. --
+WeaponIndex = 1
+WeaponArray = {"Annihilator",} -- Default Ranged Weapon Is Annihilator. Can Delete Any Weapons/Sets That You Don't Need Or Replace/Add The New Weapons That You Want To Use. --
+IdleIndex = 1
+IdleArray = {"Movement"} -- Default Idle Set Is Movement --
+Armor = 'None'
+warning = false
+AutoMode = 'ON' -- Set Default Auto RA/WS ON or OFF Here --
+Attack = 'OFF' -- Set Default Attack Set ON or OFF Here --
+Enmity = 'OFF' -- Set Default Enmity Set ON or OFF Here --
+ammo_warning_limit = 10 -- Set Ammo Limit Check Here --
+Samurai_Roll = 'ON' -- Set Default SAM Roll ON or OFF Here --
+target_distance = 5 -- Set Default Distance Here --
+ 
+ 
+ 
+ 
+-- Preshot --
+sets.Preshot = {
+ammo="Scorpion. Arrow"} -- Change to your cheap ammo
+ 
+end
+ 
+function pretarget(spell,action)
+if spell.action_type == 'Ranged Attack' and not buffactive.amnesia then -- Auto WS/Decoy Shot/Double Shot --
+if player.tp >= 4000 and AutoMode == 'ON' then
+cancel_spell()
+autoWS()
+end
+elseif spell.action_type == 'Ranged Attack' and spell.target.distance > 24.9 then
+cancel_spell()
+add_to_chat(123, spell.name..' Canceled: [Out of Range]')
+return
+elseif spell.type == 'WeaponSkill' and player.status == 'Engaged' then
+if spell.skill == 'Archery' or spell.skill == 'Marksmanship' then
+if spell.target.distance > 16+target_distance then
+cancel_spell()
+add_to_chat(123, spell.name..' Canceled: [Out of Range]')
+return
+end
+else
+if spell.target.distance > target_distance then
+cancel_spell()
+add_to_chat(123, spell.name..' Canceled: [Out of Range]')
+return
+end
+end
+end
+end
+ 
+function precast(spell,action)
+local check_ammo
+local check_ammo_count = 1
+if spell.action_type == 'Ranged Attack' then
+check_ammo = player.equipment.ammo
+if player.equipment.ammo == 'empty' or player.inventory[check_ammo].count <= check_ammo_count then
+add_to_chat(123, spell.name..' Canceled: [Out of Ammo]')
+cancel_spell()
+return
+else
+equip(sets.Preshot)
+if player.inventory[check_ammo].count <= ammo_warning_limit and player.inventory[check_ammo].count > 1 and not warning then
+add_to_chat(123, '***** [Low Ammo Warning!] *****')
+warning = true
+elseif player.inventory[check_ammo].count > ammo_warning_limit and warning then
+warning = false
+end
+end
+elseif spell.type == "WeaponSkill" then
+if player.status ~= 'Engaged' then -- Cancel WS If You Are Not Engaged. Can Delete It If You Don't Need It --
+cancel_spell()
+add_to_chat(123,'Unable To Use WeaponSkill: [Disengaged]')
+return
+else
+equipSet = sets.
+equip(equipSet)
+end
+end
+ 
+function midcast(spell,action)
+ 
+end
+ 
+function aftercast(spell,action)
+if AutoMode == 'ON' then
+autoRA()
+end
+end
+ 
+function status_change(new,old)
+if new == 'Engaged' then
+if AutoMode == 'ON' then
+autoRA()
+end
+end
+ 
+end
+ 
+ 
+-- In Game: //gs c (command), Macro: /console gs c (command), Bind: gs c (command) --
+function self_command(command)
+if command == 'C2' then -- Auto RA/WS Toggle --
+if AutoMode == 'ON' then
+AutoMode = 'OFF'
+add_to_chat(123,'Auto Mode: [OFF]')
+else
+AutoMode = 'ON'
+add_to_chat(158,'Auto Mode: [ON]')
+end
+end
+end
+ 
+function autoRA()
+if player.status == 'Engaged' then
+send_command('@wait 2.7; input /ra <t>')
+end
+end
+ 
+function autoWS() -- Change Auto WS Here --
+send_
